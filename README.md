@@ -12,7 +12,7 @@ How to run:
 1. Clone/download the repo
 2. Download univocity jar file (https://www.univocity.com/pages/univocity_parsers_download)
 3. Download javafx (preferably javafx11) (https://gluonhq.com/products/javafx/)
-4. Add jar files to your project
+4. Add jar files to your project library
 5. Build and run
 
 Approach:
