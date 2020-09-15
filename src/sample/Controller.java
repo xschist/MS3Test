@@ -3,10 +3,15 @@ package sample;
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import javafx.fxml.FXML;
 
 import java.io.*;
+import java.nio.file.StandardOpenOption;
 import java.sql.SQLOutput;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,54 +20,51 @@ public class Controller {
     @FXML
     public void uploadCSV() throws UnsupportedEncodingException, FileNotFoundException {
 
+        //univocity parser settings
         CsvParserSettings settings = new CsvParserSettings();
+        settings.setLineSeparatorDetectionEnabled(true);
         settings.getFormat().setLineSeparator("\n");
         settings.setHeaderExtractionEnabled(false);
-       // settings.setEmptyValue("<EMPTY>");
-        settings.setNullValue("<EMPTY>");
-        //settings.setMaxColumns(10);
         CsvParser parser = new CsvParser(settings);
+        //
 
-//        InputStreamReader qwe = new InputStreamReader(this.getClass().getResourceAsStream("‪D:/Earl/MS3/ms3Interview.csv"), "UTF-8");
+        LocalDateTime dateTime = LocalDateTime.now();
+        String dateTimeFormatted = dateTime.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy hh-mm-ss-a"));
+
         try{
-            String path = "D:/Earl/MS3/ms3Interview.csv";
+            //select csv from directory
+            String path = "D:/Earl/MS3/ms3Interviewsmol.csv";
+            //create new csv for invalid records
+            String newFilePath = path.replace(".csv","_Invalid Records ("+dateTimeFormatted+").csv");
             BufferedReader reader = new BufferedReader(new FileReader(path));
             System.out.println("read");
-            //List<Record> allRecords = parser.parseAllRecords(reader);
-            int a= 0;
-            /*for(Record record : allRecords){
-                System.out.print(record.getString("A"));
-                System.out.print(record.getString("B"));
-                System.out.print(record.getString("C"));
-                System.out.print(record.getString("D"));
-                System.out.print(record.getString("E"));
-                System.out.print(record.getString("F"));
-                System.out.print(record.getString("G"));
-                System.out.print(record.getString("H"));
-                System.out.print(record.getString("I"));
-                System.out.print(record.getString("J"));
-                System.out.println();
 
-                //print(", Model: " + record.getString("model"));
-                // println(", Price: " + record.getBigDecimal("price"));
-                a++;
-            }
-            */
+            int invalidCounter= 0;
 
+            //univocity writer
+            CsvWriterSettings cSettings = new CsvWriterSettings();
+            CsvWriter writer = new CsvWriter(new FileWriter(new File(newFilePath)), cSettings);
+
+            //writes to _invalid records csv and logs
             for(String[] row : parser.iterate(reader)){
+                    for(int count = 0; count<10; count++){
+                        if(row[count] == null){
+                            invalidCounter++;
+                            System.out.println(invalidCounter+ " "+Arrays.toString(row));
+                            writer.writeRow(row); break;
 
-                //System.out.println(Arrays.toString(row));
-                if((Arrays.toString(row).contains("<EMPTY>")) ||(Arrays.toString(row).contains("<NULL>"))){
-                    a++;
-                    System.out.println(a+ " "+Arrays.toString(row));
-                }
+                        }
+                    }
 
             }
-            //System.out.println(a);
+            writer.close();
+
         }
         catch (FileNotFoundException e){
             e.printStackTrace();
 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
