@@ -6,6 +6,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import javafx.fxml.FXML;
+import javafx.stage.FileChooser;
 
 import java.io.*;
 import java.nio.file.StandardOpenOption;
@@ -20,6 +21,8 @@ public class Controller {
     @FXML
     public void uploadCSV() throws UnsupportedEncodingException, FileNotFoundException {
 
+
+
         //univocity parser settings
         CsvParserSettings settings = new CsvParserSettings();
         settings.setLineSeparatorDetectionEnabled(true);
@@ -33,7 +36,8 @@ public class Controller {
 
         try{
             //select csv from directory
-            String path = "D:/Earl/MS3/ms3Interviewsmol.csv";
+           // String path = "D:/Earl/MS3/ms3Interviewsmol.csv";
+            String path = openFile();
             //create new csv for invalid records
             String newFilePath = path.replace(".csv","_Invalid Records ("+dateTimeFormatted+").csv");
             BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -72,5 +76,19 @@ public class Controller {
     @FXML
     public void viewLogs(){
 
+    }
+
+    public String openFile(){
+        try{
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select CSV File:");
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("CSV Files","*.csv"));
+            File newFile = fileChooser.showOpenDialog(null);
+           return newFile.getAbsolutePath().replace("\\","/");}
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
