@@ -84,28 +84,9 @@ public class Controller {
 
         }
     }
+    
 
     @FXML
-    public void beginParse() throws UnsupportedEncodingException, FileNotFoundException {
-/*
-        if(txtCsvLoc.getText().trim().isEmpty() || txtDbLoc.getText().trim().isEmpty()){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("Fields cannot be empty");
-            alert.setTitle("Invalid Directories");
-            alert.show();
-        }
-
-        else{*/
-            parseCSV();
-    //    }
-    }
-
-    //sql database maker
-    public void dbMaker(){
-
-
-    }
-
     //parses the csv file etc etc
     public void parseCSV() throws UnsupportedEncodingException, FileNotFoundException {
 
@@ -132,27 +113,37 @@ public class Controller {
             //create new csv for invalid records
             String newFilePath = path.replace(".csv","-bad.csv");
             BufferedReader reader = new BufferedReader(new FileReader(path));
-            System.out.println("read");
+            //System.out.println("read "+newFilePath);
 
             int invalidCounter= 0;
             int validCounter = 0;
+            int colCount = 10;
 
             //univocity writer
             CsvWriterSettings cSettings = new CsvWriterSettings();
             CsvWriter writer = new CsvWriter(new FileWriter(new File(newFilePath)), cSettings);
 
-                //IterableResult<String[], ParsingContext> row =  parser.iterate(reader);
-            int colCount = 0;
+
             IterableResult<String[], ParsingContext> row = parser.iterate(reader);
             settings.setHeaderExtractionEnabled(false);
             for(String[] roww :row ){
-                for(int count = 0; count <10; count++){
-
+                for(int count = 0; count <colCount; count++){
                     //writes to _invalid records csv and logs
                     if(roww[count] == null){
+
                         invalidCounter++;
                         System.out.println(invalidCounter+ " "+Arrays.toString(roww));
                         writer.writeRow(roww); break;
+                    }
+                    if(count == (colCount-1)){
+
+                        for(int i = count+1; i < roww.length; i++){
+                            if(!(roww[i] == null)){
+                                invalidCounter++;
+                                System.out.println(invalidCounter+ "has extra "+Arrays.toString(roww));
+                                writer.writeRow(roww); break;
+                            }
+                        }
                     }
 
                     //writes to sql database
@@ -164,11 +155,11 @@ public class Controller {
 
         }
         catch (FileNotFoundException e){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
+           /* Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Invalid CSV File");
-            alert.setContentText("CSV File not Consumed");
-
-            alert.showAndWait();
+            alert.setContentText("CSV File not found/invalid file");
+            alert.showAndWait();*/
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
