@@ -14,6 +14,7 @@ public class Main extends Application {
         primaryStage.setTitle("CSV Parser");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
+
         primaryStage.show();
     }
 
