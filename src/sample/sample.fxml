@@ -4,14 +4,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="mainBoxContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="136.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<AnchorPane fx:id="mainBoxContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="178.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <VBox fx:id="mainBox" alignment="CENTER" layoutX="220.0" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="69.0" prefWidth="150.0" spacing="10.0">
+      <Label fx:id="txtFile" layoutX="99.0" layoutY="136.0" visible="false" />
+      <VBox fx:id="mainBox" alignment="CENTER" layoutX="221.0" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="69.0" prefWidth="155.0" spacing="10.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#openCsvFile" prefHeight="18.0" prefWidth="128.0" text="Upload CSV" />
-            <AnchorPane>
+            <Button mnemonicParsing="false" onAction="#openCsvFile" prefHeight="25.0" prefWidth="136.0" text="Upload CSV" />
+            <AnchorPane prefHeight="25.0" prefWidth="131.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#dbLocator" prefHeight="21.0" prefWidth="128.0" text="Database Directory" />
+                  <Button mnemonicParsing="false" onAction="#dbLocator" prefHeight="25.0" prefWidth="136.0" text="Database Directory" />
                </children>
             </AnchorPane>
          </children>
@@ -19,13 +20,14 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </VBox>
-      <VBox layoutX="16.0" layoutY="22.0" prefHeight="60.0" prefWidth="205.0" spacing="10.0">
+      <VBox layoutX="17.0" layoutY="22.0" prefHeight="60.0" prefWidth="205.0" spacing="10.0">
          <children>
             <TextField fx:id="txtCsvLoc" promptText="ex C:\User\something.csv" />
-            <TextField fx:id="txtDbLoc" promptText="ex C:\User\something\" />
+            <TextField fx:id="txtDbLoc" prefHeight="25.0" prefWidth="185.0" promptText="ex C:\User\something.sqlite" />
          </children>
       </VBox>
-      <Button layoutX="16.0" layoutY="90.0" mnemonicParsing="false" onAction="#parseCSV" prefHeight="30.0" prefWidth="205.0" text="Begin Parsing" />
-      <Button layoutX="231.0" layoutY="90.0" mnemonicParsing="false" onAction="#viewLogs" prefHeight="30.0" prefWidth="128.0" text="View Logs" />
+      <Button layoutX="17.0" layoutY="129.0" mnemonicParsing="false" onAction="#parseCSV" prefHeight="30.0" prefWidth="205.0" text="Begin Parsing" />
+      <Button layoutX="232.0" layoutY="129.0" mnemonicParsing="false" onAction="#viewLogs" prefHeight="30.0" prefWidth="128.0" text="View Logs" />
+      <CheckBox fx:id="createDbCheck" layoutX="231.0" layoutY="85.0" mnemonicParsing="false" text="Create new database" />
    </children>
 </AnchorPane>

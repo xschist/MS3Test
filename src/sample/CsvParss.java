@@ -5,7 +5,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
 import java.io.*;
-import java.util.Arrays;
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -13,7 +13,7 @@ public class CsvParss {
 
     CsvWorkers workers = new CsvWorkers();
 
-    public void csvParsar(String csvPath, String dbpath) throws IOException {
+    public void csvParsar(String csvPath, String dbpath, String fileName) throws IOException, SQLException {
         String newPath =csvPath.replace("\\","/");
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
@@ -38,7 +38,9 @@ public class CsvParss {
         maxLength= headers.length;
         maxColumn = workers.headerExtractor(headers).length;
 
-        logCounters = workers.badRecordFinder(rows,maxLength,maxColumn, csvPath);
+        workers.connectToDb("jdbc:sqlite:"+dbpath, fileName);
+        logCounters = workers.badRecordFinder(rows,maxLength,maxColumn, csvPath, fileName);
         workers.alert(dbpath, csvPath, newPath, logCounters);
+
     }
 }
