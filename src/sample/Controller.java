@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import javax.tools.Tool;
 import java.io.*;
+import java.sql.SQLException;
 
 public class Controller {
 
@@ -84,7 +85,7 @@ public class Controller {
         CsvParss pars = new CsvParss();
         try {
             pars.csvParsar(txtCsvLoc.getText(), txtDbLoc.getText(), txtFile.getText());
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
 

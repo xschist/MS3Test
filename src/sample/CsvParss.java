@@ -39,7 +39,7 @@ public class CsvParss {
         maxColumn = workers.headerExtractor(headers).length;
 
         workers.connectToDb("jdbc:sqlite:"+dbpath, fileName);
-        logCounters = workers.badRecordFinder(rows,maxLength,maxColumn, csvPath, fileName);
+        logCounters = workers.badRecordFinder(headers, rows,maxLength,maxColumn, csvPath, fileName);
         workers.alert(dbpath, csvPath, newPath, logCounters);
 
     }

@@ -15,23 +15,23 @@ import java.util.List;
 
 public class CsvWorkers {
 
-    Connection conn;
-
+    public String urlGlobal = "";
+    public Connection conn;
 
 
     //extracts headers, removes nulls idk
-    public String[] headerExtractor(String[] rowYourBoat){
+    public String[] headerExtractor(String[] rowYourBoat) {
 
         int count = 0;
-        for(int i = 0; i<rowYourBoat.length; i++){
-              if (rowYourBoat[i] ==null){
-                  break;
-              }
-            count = i+1;
+        for (int i = 0; i < rowYourBoat.length; i++) {
+            if (rowYourBoat[i] == null) {
+                break;
+            }
+            count = i + 1;
         }
         String[] headers = new String[count];
 
-        for(int i = 0; i<count; i++){
+        for (int i = 0; i < count; i++) {
             headers[i] = rowYourBoat[i];
         }
 
@@ -39,8 +39,8 @@ public class CsvWorkers {
     }
 
     //identifies records with missing/extra entries then writes them to <input-filename>-bad.csv (same directory)
-    public int[] badRecordFinder(List<String[]> allRows, int maxColumn, int columnCount, String path, String fileName)
-            throws IOException, SQLException {
+    public int[] badRecordFinder(String[] headers, List<String[]> allRows, int maxColumn, int columnCount, String path,
+                                 String fileName) throws IOException, SQLException {
 
         //bunch of univocity csv settings
         CsvParserSettings parserSettings = new CsvParserSettings();
@@ -51,12 +51,12 @@ public class CsvWorkers {
         parserSettings.setHeaderExtractionEnabled(true);
         parserSettings.setNullValue(null);
         CsvWriterSettings cSettings = new CsvWriterSettings();
-        String newFilePath = path.replace(".csv","-bad.csv");
+        String newFilePath = path.replace(".csv", "-bad.csv");
         CsvWriter writer = new CsvWriter(new FileWriter(new File(newFilePath)), cSettings);
 
         boolean foundBadRecord;
         int[] count = new int[2];
-        for (String[]row:allRows) {
+        for (String[] row : allRows) {
 
             foundBadRecord = false;
 
@@ -84,9 +84,9 @@ public class CsvWorkers {
                 }
             }
 
-            if(foundBadRecord==false){
-                count[1]+=1;
-                insertToDb(row, fileName);
+            if (foundBadRecord == false) {
+                count[1] += 1;
+               // insertToDb(headers, row, fileName);
             }
 
         }
@@ -96,45 +96,16 @@ public class CsvWorkers {
     }
 
     //info alert
-    public void alert(String dbLocation, String csvLocation, String badCsvLocation, int[] counters){
+    public void alert(String dbLocation, String csvLocation, String badCsvLocation, int[] counters) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Finished Parsing!");
         alert.initStyle(StageStyle.UTILITY);
-        alert.setContentText("File parsed: "+csvLocation+".\n"+
-                        "Found "+counters[0]+" invalid entries out of "+(counters[0]+counters[1])+" records.\n"+
-                        "Written invalid records to "+badCsvLocation.replace("/","\\")+".\n"+
-                        "Written "+counters[1]+" valid records to "+dbLocation+".\n");
+        alert.setContentText("File parsed: " + csvLocation + ".\n" +
+                "Found " + counters[0] + " invalid entries out of " + (counters[0] + counters[1]) + " records.\n" +
+                "Written invalid records to " + badCsvLocation.replace("/", "\\") + ".\n" +
+                "Written " + counters[1] + " valid records to " + dbLocation + ".\n");
 
         alert.showAndWait();
-    }
-
-
-    public static void connectToDb(String dbNameLoc, String fileName) {
-
-        //will connect to existing db
-        //will create if no db is found
-        String url = fileName.replace("\\","/");
-        if(!url.contains(".db") || !url.contains(".sqlite")){
-            url += ".db";
-
-            Controller contr = new Controller();
-            contr.setTxtDbLoc(url);
-        }
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public void insertToDb(String[] row, String fileName) throws SQLException {
-        Statement statement = conn.createStatement();
     }
 
 }
