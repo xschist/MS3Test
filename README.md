@@ -14,6 +14,8 @@ How to run:
 3. Download javafx (preferably javafx11) (https://gluonhq.com/products/javafx/)
 4. Add jar files to your project library
 5. Build and run
+(PS. did not use maven, encountered dependency issues which i have not resolved. took me days :/)
+
 
 Approach:
 For this project I used Univocity Parsers (since it claimed it was the fastest),
