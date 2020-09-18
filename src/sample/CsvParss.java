@@ -12,6 +12,7 @@ import java.util.List;
 public class CsvParss {
 
     CsvWorkers workers = new CsvWorkers();
+    sqlWorkers sqlWorker =new sqlWorkers();
 
     public void csvParsar(String csvPath, String dbpath, String fileName) throws IOException, SQLException {
         String newPath =csvPath.replace("\\","/");
@@ -19,10 +20,9 @@ public class CsvParss {
         parserSettings.setLineSeparatorDetectionEnabled(true);
         RowListProcessor rowProcessor = new RowListProcessor();
         parserSettings.setProcessor(rowProcessor);
-        parserSettings.setHeaderExtractionEnabled(false);
+        parserSettings.setHeaderExtractionEnabled(true);
         CsvParser parser = new CsvParser(parserSettings);
 
-        int maxLength;
         int maxColumn;
         int[] logCounters;
 
@@ -35,11 +35,10 @@ public class CsvParss {
         String[] headers = rowProcessor.getHeaders();
         List<String[]> rows = rowProcessor.getRows();
 
-        maxLength= headers.length;
         maxColumn = workers.headerExtractor(headers).length;
 
-        workers.connectToDb("jdbc:sqlite:"+dbpath, fileName);
-        logCounters = workers.badRecordFinder(headers, rows,maxLength,maxColumn, csvPath, fileName);
+        sqlWorker.connectToDb("jdbc:sqlite:"+dbpath, fileName);
+        logCounters = workers.badRecordFinder(headers, rows,maxColumn, csvPath, fileName, dbpath);
         workers.alert(dbpath, csvPath, newPath, logCounters);
 
     }

@@ -7,16 +7,17 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
 
+import java.awt.*;
 import java.sql.*;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class CsvWorkers {
-
-    public String urlGlobal = "";
-    public Connection conn;
 
 
     //extracts headers, removes nulls idk
@@ -39,20 +40,23 @@ public class CsvWorkers {
     }
 
     //identifies records with missing/extra entries then writes them to <input-filename>-bad.csv (same directory)
-    public int[] badRecordFinder(String[] headers, List<String[]> allRows, int maxColumn, int columnCount, String path,
-                                 String fileName) throws IOException, SQLException {
+    public int[] badRecordFinder(String[] headers, List<String[]> allRows, int columnCount, String path,
+                                 String fileName, String dbPath) throws IOException, SQLException {
 
+        List<String[]> goodRows = new ArrayList<>();
         //bunch of univocity csv settings
         CsvParserSettings parserSettings = new CsvParserSettings();
         RowListProcessor rowProcessor = new RowListProcessor();
         parserSettings.setLineSeparatorDetectionEnabled(true);
         parserSettings.setProcessor(rowProcessor);
-        parserSettings.setMaxCharsPerColumn(-1);
         parserSettings.setHeaderExtractionEnabled(true);
         parserSettings.setNullValue(null);
+        parserSettings.setNumberOfRowsToSkip(1);
         CsvWriterSettings cSettings = new CsvWriterSettings();
         String newFilePath = path.replace(".csv", "-bad.csv");
         CsvWriter writer = new CsvWriter(new FileWriter(new File(newFilePath)), cSettings);
+
+        sqlWorkers worker = new sqlWorkers();
 
         boolean foundBadRecord;
         int[] count = new int[2];
@@ -86,12 +90,14 @@ public class CsvWorkers {
 
             if (foundBadRecord == false) {
                 count[1] += 1;
-               // insertToDb(headers, row, fileName);
+                goodRows.add(row);
             }
 
         }
 
+        worker.insertToDb(headers,goodRows, fileName, dbPath);
         writer.close();
+        writeToLog(count, fileName, path);
         return count;
     }
 
@@ -102,10 +108,27 @@ public class CsvWorkers {
         alert.initStyle(StageStyle.UTILITY);
         alert.setContentText("File parsed: " + csvLocation + ".\n" +
                 "Found " + counters[0] + " invalid entries out of " + (counters[0] + counters[1]) + " records.\n" +
-                "Written invalid records to " + badCsvLocation.replace("/", "\\") + ".\n" +
-                "Written " + counters[1] + " valid records to " + dbLocation + ".\n");
+                "Written invalid records to " + badCsvLocation.replace("/", "\\")
+                        .replace(".csv", "-bad.csv") + ".\n" +
+                "Written " + counters[1] + " valid records to " + dbLocation + ".\n"
+        );
 
         alert.showAndWait();
     }
 
+    public void writeToLog(int[] counter, String fileName, String path) throws IOException {
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        File logFile = new File("db/"+fileName.replace(".csv", ".log "));
+        FileWriter writer = new FileWriter(logFile, true);
+        PrintWriter pWriter = new PrintWriter(writer);
+
+        pWriter.println("File: "+path.replace("/","\\")+" "+ dateTime.format(DateTimeFormatter.ofPattern("MMM dd,yyyy hh:mm:ss a")));
+        pWriter.println("Records received: "+(counter[0]+counter[1])+"");
+        pWriter.println("Records successful: "+counter[1]);
+        pWriter.println("Records failed: "+counter[0]);
+        pWriter.println("-----------------------------");
+        pWriter.close();
+        Desktop.getDesktop().open(new File(logFile.getAbsolutePath()));
+    }
 }
