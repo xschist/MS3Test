@@ -18,3 +18,8 @@ How to run:
 Approach:
 For this project I used Univocity Parsers (since it claimed it was the fastest),
 JavaFX for the simple GUI, and SQLite for the database.
+
+PS. 
+-haven't done any major exception handling
+-app might not respond while being fed large csv files
+-db directory not necessary
